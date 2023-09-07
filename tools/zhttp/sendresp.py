@@ -16,14 +16,14 @@ sock.connect('ipc://client-in')
 # await subscription
 time.sleep(0.01)
 
-resp = {}
-resp[b'from'] = b'sendresp'
-resp[b'id'] = rid
-resp[b'code'] = 200
-resp[b'reason'] = b'OK'
-resp[b'headers'] = [[b'Content-Type', b'text/plain']]
-resp[b'body'] = '{}\n'.format(body).encode()
-
+resp = {
+    b'from': b'sendresp',
+    b'id': rid,
+    b'code': 200,
+    b'reason': b'OK',
+    b'headers': [[b'Content-Type', b'text/plain']],
+    b'body': f'{body}\n'.encode(),
+}
 m = [addr + b' T' + tnetstring.dumps(resp)]
 
 sock.send_multipart(m)

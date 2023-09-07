@@ -4,7 +4,7 @@ import tnetstring
 import zmq
 
 if len(sys.argv) < 2:
-    print('usage: {} [url]'.format(sys.argv[0]))
+    print(f'usage: {sys.argv[0]} [url]')
     sys.exit(1)
 
 ctx = zmq.Context()
@@ -22,14 +22,14 @@ sock.send(b'T' + tnetstring.dumps(req))
 
 resp = tnetstring.loads(sock.recv()[1:])
 if b'type' in resp and resp[b'type'] == b'error':
-    print('error: {}'.format(resp[b'condition']))
+    print(f"error: {resp[b'condition']}")
     sys.exit(1)
 
-print('code={} reason=[{}]'.format(resp[b'code'], resp[b'reason']))
+print(f"code={resp[b'code']} reason=[{resp[b'reason']}]")
 for h in resp[b'headers']:
-    print('{}: {}'.format(h[0], h[1]))
+    print(f'{h[0]}: {h[1]}')
 
 if b'body' in resp:
-    print('\n{}'.format(resp[b'body']))
+    print(f"\n{resp[b'body']}")
 else:
     print('\n')

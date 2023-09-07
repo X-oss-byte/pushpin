@@ -4,7 +4,7 @@ import os
 import tnetstring
 import zmq
 
-instance_id = 'streamhandler.{}'.format(os.getpid()).encode('utf-8')
+instance_id = f'streamhandler.{os.getpid()}'.encode('utf-8')
 
 ctx = zmq.Context()
 in_sock = ctx.socket(zmq.PULL)
@@ -31,44 +31,39 @@ while True:
         continue
 
     req = tnetstring.loads(m_raw[1:])
-    print('IN {}'.format(req))
+    print(f'IN {req}')
 
     if req.get(b'type'):
         # skip all non-data messages
         continue
 
+    resp = {b'from': instance_id}
     if req.get(b'uri', b'').startswith(b'ws'):
-        resp = {}
-        resp[b'from'] = instance_id
         resp[b'id'] = req[b'id']
         resp[b'seq'] = 0
         resp[b'code'] = 101
         resp[b'reason'] = b'Switching Protocols'
         resp[b'credits'] = 1024
 
-        print('OUT {} {}'.format(req[b'from'], resp))
+        print(f"OUT {req[b'from']} {resp}")
         out_sock.send(req[b'from'] + b' T' + tnetstring.dumps(resp))
 
-        resp = {}
-        resp[b'from'] = instance_id
+        resp = {b'from': instance_id}
         resp[b'id'] = req[b'id']
         resp[b'seq'] = 1
         resp[b'body'] = b'hello world'
 
-        print('OUT {} {}'.format(req[b'from'], resp))
+        print(f"OUT {req[b'from']} {resp}")
         out_sock.send(req[b'from'] + b' T' + tnetstring.dumps(resp))
 
-        resp = {}
-        resp[b'from'] = instance_id
+        resp = {b'from': instance_id}
         resp[b'id'] = req[b'id']
         resp[b'seq'] = 2
         resp[b'type'] = b'close'
 
-        print('OUT {} {}'.format(req[b'from'], resp))
+        print(f"OUT {req[b'from']} {resp}")
         out_sock.send(req[b'from'] + b' T' + tnetstring.dumps(resp))
     else:
-        resp = {}
-        resp[b'from'] = instance_id
         resp[b'id'] = req[b'id']
         resp[b'seq'] = 0
         resp[b'code'] = 200
@@ -77,14 +72,13 @@ while True:
         resp[b'more'] = True
         resp[b'credits'] = 1024
 
-        print('OUT {} {}'.format(req[b'from'], resp))
+        print(f"OUT {req[b'from']} {resp}")
         out_sock.send(req[b'from'] + b' T' + tnetstring.dumps(resp))
 
-        resp = {}
-        resp[b'from'] = instance_id
+        resp = {b'from': instance_id}
         resp[b'id'] = req[b'id']
         resp[b'seq'] = 1
         resp[b'body'] = b'hello world\n'
 
-        print('OUT {} {}'.format(req[b'from'], resp))
+        print(f"OUT {req[b'from']} {resp}")
         out_sock.send(req[b'from'] + b' T' + tnetstring.dumps(resp))

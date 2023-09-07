@@ -10,9 +10,9 @@ def resolve(uri):
 		addr = uri[6:at]
 		if addr == '*':
 			if command_host:
-				return uri[0:6] + command_host + uri[at:]
+				return uri[:6] + command_host + uri[at:]
 			else:
-				return uri[0:6] + 'localhost' + uri[at:]
+				return f'{uri[:6]}localhost{uri[at:]}'
 	return uri
 
 command_uri = sys.argv[1]

@@ -10,7 +10,7 @@ import zmq
 CONN_TTL = 60000
 EXPIRE_INTERVAL = 60000
 
-instance_id = 'holdhandler.{}'.format(os.getpid()).encode('utf-8')
+instance_id = f'holdhandler.{os.getpid()}'.encode('utf-8')
 
 ctx = zmq.Context()
 in_sock = ctx.socket(zmq.PULL)
@@ -37,23 +37,20 @@ class Connection(object):
         msg[b'seq'] = self.seq
         self.seq += 1
 
-        print('OUT {} {}'.format(self.rid[0], msg))
+        print(f'OUT {self.rid[0]} {msg}')
         out_sock.send(self.rid[0] + b' T' + tnetstring.dumps(msg))
 
     def send_header(self):
-        msg = {}
-        msg[b'code'] = 200
-        msg[b'reason'] = b'OK'
-        msg[b'headers'] = [[b'Content-Type', b'text/plain']]
-        msg[b'more'] = True
-
+        msg = {
+            b'code': 200,
+            b'reason': b'OK',
+            b'headers': [[b'Content-Type', b'text/plain']],
+            b'more': True,
+        }
         self.send_msg(msg)
 
     def send_body(self, data):
-        msg = {}
-        msg[b'body'] = data
-        msg[b'more'] = True
-
+        msg = {b'body': data, b'more': True}
         self.send_msg(msg)
 
 def send_body(to_addr, conns, data):
@@ -62,13 +59,8 @@ def send_body(to_addr, conns, data):
         ids.append({b'id': c.rid[1], b'seq': c.seq})
         c.seq += 1
 
-    msg = {}
-    msg[b'from'] = instance_id
-    msg[b'id'] = ids
-    msg[b'body'] = data
-    msg[b'more'] = True
-
-    print('OUT {} {}'.format(to_addr, msg))
+    msg = {b'from': instance_id, b'id': ids, b'body': data, b'more': True}
+    print(f'OUT {to_addr} {msg}')
     out_sock.send(to_addr + b' T' + tnetstring.dumps(msg))
 
 conns = {}
@@ -89,7 +81,7 @@ while True:
 
     if m_raw is not None:
         req = tnetstring.loads(m_raw[1:])
-        print('IN {}'.format(req))
+        print(f'IN {req}')
 
         m_from = req[b'from']
         m_id = req[b'id']
@@ -97,8 +89,7 @@ while True:
 
         ids = []
         if isinstance(m_id, list):
-            for id_seq in m_id:
-                ids.append(id_seq[b'id'])
+            ids.extend(id_seq[b'id'] for id_seq in m_id)
         else:
             ids.append(m_id)
 
@@ -150,8 +141,8 @@ while True:
 
         to_remove = []
         for rid, c in conns.items():
-            if now >= c.exp_time:
+            if last_exp_time >= c.exp_time:
                 to_remove.append(rid)
         for rid in to_remove:
-            print('expired {}'.format(rid))
+            print(f'expired {rid}')
             del conns[rid]

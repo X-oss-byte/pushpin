@@ -10,14 +10,14 @@ sock.connect('ipc://client')
 while True:
     m_raw = sock.recv()
     req = tnetstring.loads(m_raw[1:])
-    print('IN {}'.format(req))
+    print(f'IN {req}')
 
-    resp = {}
-    resp[b'id'] = req[b'id']
-    resp[b'code'] = 200
-    resp[b'reason'] = b'OK'
-    resp[b'headers'] = [[b'Content-Type', b'text/plain']]
-    resp[b'body'] = b'hello world\n'
-
-    print('OUT {}'.format(resp))
+    resp = {
+        b'id': req[b'id'],
+        b'code': 200,
+        b'reason': b'OK',
+        b'headers': [[b'Content-Type', b'text/plain']],
+        b'body': b'hello world\n',
+    }
+    print(f'OUT {resp}')
     sock.send(b'T' + tnetstring.dumps(resp))

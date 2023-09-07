@@ -38,10 +38,14 @@ while True:
     indata = tnetstring.loads(buf[at + 2:])
     if indata[b'id'] != rid:
         continue
-    print('IN: {}'.format(indata))
+    print(f'IN: {indata}')
     assert(indata[b'seq'] == inseq)
     inseq += 1
-    if (b'type' in indata and (indata[b'type'] == b'error' or indata[b'type'] == b'cancel')) or (b'type' not in indata and b'more' not in indata):
+    if (
+        b'type' in indata
+        and indata[b'type'] in [b'error', b'cancel']
+        or (b'type' not in indata and b'more' not in indata)
+    ):
         break
     raddr = indata[b'from']
     if b'body' in indata and len(indata[b'body']) > 0:
@@ -52,6 +56,6 @@ while True:
             b'type': b'credit',
             b'credits': len(indata[b'body']),
         }
-        print('OUT: {}'.format(outdata))
+        print(f'OUT: {outdata}')
         out_stream_sock.send_multipart([raddr, b'', b'T' + tnetstring.dumps(outdata)])
         outseq += 1

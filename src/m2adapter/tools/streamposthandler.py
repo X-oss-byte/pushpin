@@ -17,10 +17,7 @@ class Session(object):
 
 	def take_data(self):
 		left = len(self.data) - self.offset
-		if self.credits >= left:
-			take = left
-		else:
-			take = self.credits
+		take = left if self.credits >= left else self.credits
 		body = self.data[self.offset:self.offset + take]
 		self.offset += take
 		self.credits -= take

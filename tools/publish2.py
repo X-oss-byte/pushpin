@@ -6,7 +6,7 @@ import tnetstring
 import zmq
 
 if len(sys.argv) < 3:
-    print('usage: {} [channel] [content]'.format(sys.argv[0]))
+    print(f'usage: {sys.argv[0]} [channel] [content]')
     sys.exit(1)
 
 channel = sys.argv[1]

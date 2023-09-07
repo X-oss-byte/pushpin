@@ -20,4 +20,4 @@ while True:
 		'body': 'hello there\n'
 	}
 
-	sock.send('T' + tnetstring.dumps(resp))
+	sock.send(f'T{tnetstring.dumps(resp)}')

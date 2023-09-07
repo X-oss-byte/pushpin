@@ -2,7 +2,7 @@ import sys
 import zmq
 
 if len(sys.argv) < 2:
-    print('usage: {} [pub_spec]'.format(sys.argv[0]))
+    print(f'usage: {sys.argv[0]} [pub_spec]')
     sys.exit(1)
 
 spec = sys.argv[1]
@@ -18,7 +18,7 @@ while True:
     m = sock.recv()
     mtype = int(m[0])
     topic = m[1:].decode('utf-8')
-    if mtype == 1:
-        print('SUB {}'.format(topic))
-    elif mtype == 0:
-        print('UNSUB {}'.format(topic))
+    if mtype == 0:
+        print(f'UNSUB {topic}')
+    elif mtype == 1:
+        print(f'SUB {topic}')

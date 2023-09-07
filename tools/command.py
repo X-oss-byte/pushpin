@@ -6,15 +6,9 @@ import zmq
 
 def make_tnet_compat(obj):
     if isinstance(obj, dict):
-        out = {}
-        for k, v in obj.items():
-            out[make_tnet_compat(k)] = make_tnet_compat(v)
-        return out
+        return {make_tnet_compat(k): make_tnet_compat(v) for k, v in obj.items()}
     elif isinstance(obj, list):
-        out = list()
-        for v in obj:
-            out.append(make_tnet_compat(v))
-        return out
+        return [make_tnet_compat(v) for v in obj]
     elif isinstance(obj, str):
         return obj.encode('utf-8')
     else:
@@ -32,7 +26,7 @@ if len(sys.argv) > 3:
 else:
     args = {}
 
-print('calling {}: args={}'.format(method, repr(args)))
+print(f'calling {method}: args={repr(args)}')
 
 req = {
     b'id': str(uuid.uuid4()).encode('utf-8'),
@@ -46,8 +40,8 @@ resp = tnetstring.loads(sock.recv())
 
 if resp[b'success']:
     value = resp[b'value']
-    print('success: {}'.format(repr(value)))
+    print(f'success: {repr(value)}')
 else:
     condition = resp[b'condition'].decode('utf-8')
     value = resp.get(b'value')
-    print('error: {} {}'.format(condition, repr(value)))
+    print(f'error: {condition} {repr(value)}')
