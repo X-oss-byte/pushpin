@@ -5,15 +5,9 @@ import zmq
 
 def ensure_str(i):
     if isinstance(i, dict):
-        out = {}
-        for k, v in i.items():
-            out[ensure_str(k)] = ensure_str(v)
-        return out
+        return {ensure_str(k): ensure_str(v) for k, v in i.items()}
     elif isinstance(i, list):
-        out = []
-        for v in i:
-            out.append(ensure_str(v))
-        return out
+        return [ensure_str(v) for v in i]
     elif isinstance(i, bytes):
         return i.decode('utf-8')
     else:
@@ -25,7 +19,7 @@ sock.connect(sys.argv[1])
 
 if len(sys.argv) >= 3:
     for mtype in sys.argv[2].split(','):
-        sock.setsockopt(zmq.SUBSCRIBE, '{} '.format(mtype).encode('utf-8'))
+        sock.setsockopt(zmq.SUBSCRIBE, f'{mtype} '.encode('utf-8'))
 else:
     sock.setsockopt(zmq.SUBSCRIBE, b'')
 
@@ -40,4 +34,4 @@ while True:
         m = json.loads(mdata[1:])
     else:
         m = mdata
-    print('{} {}'.format(mtype, m))
+    print(f'{mtype} {m}')

@@ -15,29 +15,29 @@ class Rule(object):
 
 class Session(object):
 	def __init__(self):
-		self.last_ids = dict()
+		self.last_ids = {}
 
-rules = list()
-sessions = dict()
+rules = []
+sessions = {}
 
 def session_detect_rules_set(new_rules):
 	for nr in new_rules:
-		found = False
-		for r in rules:
-			if r.domain == nr.domain and r.path_prefix == nr.path_prefix and r.sid_ptr == nr.sid_ptr and r.json_param == nr.json_param:
-				found = True
-				break
+		found = any(
+			r.domain == nr.domain
+			and r.path_prefix == nr.path_prefix
+			and r.sid_ptr == nr.sid_ptr
+			and r.json_param == nr.json_param
+			for r in rules
+		)
 		if found:
 			continue
 
 		rules.append(nr)
 
 def session_detect_rules_get(domain, path):
-	out = list()
-	for r in rules:
-		if r.domain == domain and path.startswith(r.path_prefix):
-			out.append(r)
-	return out
+	return [
+		r for r in rules if r.domain == domain and path.startswith(r.path_prefix)
+	]
 
 def session_create_or_update(sid, last_ids):
 	s = sessions.get(sid)
@@ -56,10 +56,7 @@ def session_update(sid, last_ids):
 
 def session_get_last_ids(sid):
 	s = sessions.get(sid)
-	if s is not None:
-		return s.last_ids
-	else:
-		return None
+	return s.last_ids if s is not None else None
 
 while True:
 	req = tnetstring.loads(sock.recv())

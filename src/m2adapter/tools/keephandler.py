@@ -10,7 +10,7 @@ class Session(object):
 		self.to_address = None
 		self.out_seq = 0
 
-sessions = dict()
+sessions = {}
 lock = threading.Lock()
 
 client_id = 'zhttp-test'

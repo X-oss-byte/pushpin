@@ -24,15 +24,9 @@ import zmq
 
 def ensure_utf8(i):
 	if isinstance(i, dict):
-		out = {}
-		for k, v in i.iteritems():
-			out[ensure_utf8(k)] = ensure_utf8(v)
-		return out
+		return {ensure_utf8(k): ensure_utf8(v) for k, v in i.iteritems()}
 	elif isinstance(i, list):
-		out = []
-		for v in i:
-			out.append(ensure_utf8(v))
-		return out
+		return [ensure_utf8(v) for v in i]
 	elif isinstance(i, unicode):
 		return i.encode("utf-8")
 	else:

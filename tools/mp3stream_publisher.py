@@ -18,4 +18,19 @@ thread = threading.Thread(target=publish_worker)
 thread.daemon = True
 thread.start()
 
-subprocess.check_call(['gst-launch-1.0', 'filesrc', 'location=%s' % sys.argv[1], '!', 'decodebin', '!', 'queue', '!', 'lamemp3enc', '!', 'udpsink', 'clients=localhost:5004'])
+subprocess.check_call(
+	[
+		'gst-launch-1.0',
+		'filesrc',
+		f'location={sys.argv[1]}',
+		'!',
+		'decodebin',
+		'!',
+		'queue',
+		'!',
+		'lamemp3enc',
+		'!',
+		'udpsink',
+		'clients=localhost:5004',
+	]
+)

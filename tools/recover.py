@@ -12,4 +12,4 @@ sock.send(tnetstring.dumps(req))
 
 resp = tnetstring.loads(sock.recv())
 if not resp.get('success'):
-	raise ValueError('request failed: %s' % resp)
+	raise ValueError(f'request failed: {resp}')
